@@ -1,10 +1,10 @@
-# 🎯 Intelligent Jobseeker Engagement System
+# Intelligent Jobseeker Engagement System
 
 > AI-powered chatbot assistant for personalized job recommendations, skill gap analysis, and resume coaching.
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```
 jobseeker-ai/
@@ -23,34 +23,9 @@ jobseeker-ai/
 │   ├─ jobs.csv             ← Job listings dataset
 │   └─ skills.json          ← Skills taxonomy + roadmaps
 └─ requirements.txt
-```
 
----
 
-## ⚡ Quick Start (Member 1 — Backend Lead)
-
-### Step 1: Install dependencies
-```bash
-cd jobseeker-ai
-pip install -r requirements.txt
-```
-
-### Step 2: Start the backend
-```bash
-uvicorn backend.app:app --reload --port 8000
-```
-
-### Step 3: Test the API
-Open: **http://localhost:8000/docs** (Swagger UI)
-
-### Step 4: Start the frontend (new terminal)
-```bash
-streamlit run ui/streamlit_app.py
-```
-
----
-
-## 🔌 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -64,7 +39,7 @@ streamlit run ui/streamlit_app.py
 
 ---
 
-## 📬 Sample API Requests
+## Sample API Requests
 
 ### POST /recommend
 ```json
@@ -107,7 +82,7 @@ streamlit run ui/streamlit_app.py
 
 ---
 
-## 🧩 Module Details
+##  Module Details
 
 ### `extract_skills.py`
 - Regex + keyword matching against `skills.json` taxonomy
@@ -163,7 +138,7 @@ http://your-server:8000/chatbot/webhook
 
 ---
 
-## ✅ Member 1 Checklist
+##  Member 1 Checklist
 
 - [x] FastAPI installed and running (`/health` returns 200)
 - [x] CORS middleware configured
@@ -179,7 +154,7 @@ http://your-server:8000/chatbot/webhook
 
 ---
 
-## 🎯 Success Verification
+##  Success Verification
 
 Run this quick test after starting the server:
 
