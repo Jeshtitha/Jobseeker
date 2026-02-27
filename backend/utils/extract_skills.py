@@ -1,7 +1,6 @@
 """
 extract_skills.py - NLP-based skill extraction from resume text
 """
-
 import re
 import json
 from pathlib import Path
