@@ -1,4 +1,3 @@
-
 """
 streamlit_app.py — Intelligent Jobseeker Engagement System
 Frontend for the FastAPI backend (backend/app.py)
@@ -18,6 +17,12 @@ import streamlit as st
 from typing import Optional
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service_account.json"
+
+# ─── Auth imports ─────────────────────────────────────────────────────────────
+from auth_page import (
+    render_auth_page, render_user_menu, is_logged_in,
+    current_user, render_profile_page
+)
 
 try:
     from PyPDF2 import PdfReader
@@ -235,9 +240,23 @@ def check_health() -> bool:
 
 # ─── Sidebar ──────────────────────────────────────────────────────────────────
 
+# ─── Auth Gate ────────────────────────────────────────────────────────────────
+if not is_logged_in():
+    render_auth_page()
+    st.stop()
+
+# ─── Profile page override ────────────────────────────────────────────────────
+if st.session_state.get("auth_page") == "profile":
+    render_profile_page()
+    st.stop()
+
 with st.sidebar:
     st.markdown("## JobSeeker AI")
     st.markdown("*Career Intelligence Platform*")
+    st.divider()
+
+    # ── Logged-in user chip + logout ──
+    render_user_menu()
     st.divider()
 
     page = st.radio(
