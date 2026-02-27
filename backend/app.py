@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from backend.recommendation import get_recommendations, recommend_from_resume
 from backend.skill_gap import analyze_skill_gap, analyze_gap_from_resume
 from backend.resume_tips import get_resume_tips
+from backend.utils.extract_skills import extract_skills
 
 # ─── App Setup ────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
