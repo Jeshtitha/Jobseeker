@@ -1,3 +1,4 @@
+
 """
 streamlit_app.py — Intelligent Jobseeker Engagement System
 Frontend for the FastAPI backend (backend/app.py)
@@ -9,10 +10,14 @@ Run:
     streamlit run streamlit_app.py
 """
 
+import os
 import io
 import json
 import requests
 import streamlit as st
+from typing import Optional
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service_account.json"
 
 try:
     from PyPDF2 import PdfReader
@@ -32,10 +37,11 @@ except ImportError:
 
 
 # ─── Page Config ──────────────────────────────────────────────────────────────
+# MUST be the very first Streamlit call
 
 st.set_page_config(
     page_title="JobSeeker AI",
-    page_icon="briefcase",
+    page_icon="💼",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -195,7 +201,7 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
     return "\n".join(parts)
 
 
-def api_post(endpoint: str, payload: dict) -> dict | None:
+def api_post(endpoint: str, payload: dict) -> Optional[dict]:
     base = st.session_state.get("api_url", "http://localhost:8000").rstrip("/")
     try:
         resp = requests.post(f"{base}{endpoint}", json=payload, timeout=30)
@@ -214,7 +220,7 @@ def api_post(endpoint: str, payload: dict) -> dict | None:
     return None
 
 
-def skill_tags_html(skills: list[str], cls: str = "tag-neutral") -> str:
+def skill_tags_html(skills: list, cls: str = "tag-neutral") -> str:
     return " ".join(f'<span class="{cls}">{s}</span>' for s in skills)
 
 
@@ -266,7 +272,7 @@ if page == "Overview":
     st.markdown('<div class="page-title">Career Intelligence Platform</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-desc">An AI-powered system for job matching, skill gap analysis, and resume coaching. Select a module from the sidebar to get started.</div>', unsafe_allow_html=True)
 
-    st.info("**Getting Started:** Ensure your FastAPI backend is running and use **Test Connection** in the sidebar to verify connectivity.", icon=None)
+    st.info("**Getting Started:** Ensure your FastAPI backend is running and use **Test Connection** in the sidebar to verify connectivity.")
 
     col1, col2 = st.columns(2)
 
@@ -472,7 +478,7 @@ elif page == "Skill Gap Analysis":
             st.divider()
 
         c1, c2, c3 = st.columns(3)
-        pct_num = int(pct.replace("%","")) if "%" in pct else 0
+        pct_num = int(pct.replace("%","")) if "%" in str(pct) else 0
         with c1:
             st.metric("Job Readiness", pct)
         with c2:
@@ -611,7 +617,7 @@ elif page == "Resume Coaching":
     if not PDF_SUPPORT:
         st.warning("PDF parsing requires PyPDF2 or pypdf. Install with: `pip install pypdf2`")
 
-    # ── File upload (only — no text area) ──
+    # ── File upload ──
     uploaded = st.file_uploader(
         "Upload Resume (PDF)",
         type=["pdf", "txt", "doc"],
@@ -702,7 +708,6 @@ elif page == "Resume Coaching":
                 st.markdown('<div class="section-label">Detailed Check Results</div>', unsafe_allow_html=True)
                 rows = []
                 for c in checks:
-                    s = int(str(c.get("score","0")).split("/")[0])
                     rows.append({
                         "Section":  c.get("section", ""),
                         "Score":    c.get("score", ""),
@@ -744,110 +749,209 @@ elif page == "Resume Coaching":
 # ─── Page: AI Assistant ───────────────────────────────────────────────────────
 
 elif page == "AI Assistant":
-    st.markdown('<div class="page-tag">POST /chatbot/webhook</div>', unsafe_allow_html=True)
+    import streamlit.components.v1 as components
+
+    st.markdown('<div class="page-tag">Dialogflow Messenger &nbsp;|&nbsp; Webhook Chat</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-title">AI Assistant</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-desc">Conversational interface to the Dialogflow-compatible chatbot webhook. Supports intents: job.recommend, skill.gap, resume.tips.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-desc">Two ways to chat: use the embedded <b>Dialogflow Messenger</b> widget (Tab 1) powered by your Google Dialogflow ES agent, or use the <b>Webhook Chat</b> (Tab 2) which calls your FastAPI backend directly.</div>', unsafe_allow_html=True)
 
-    # Session state for chat history
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = [
-            {
-                "role": "assistant",
-                "content": (
-                    "Hello. I am your Jobseeker AI Assistant.\n\n"
-                    "I can help you with:\n"
-                    "  - Job recommendations based on your skills\n"
-                    "  - Skill gap analysis for a target role\n"
-                    "  - Resume coaching and ATS scoring\n\n"
-                    "How can I help you today?"
-                ),
-            }
-        ]
+    tab1, tab2 = st.tabs(["💬 Dialogflow Messenger", "🔗 Webhook Chat"])
 
-    # Quick-action buttons
-    col1, col2, col3, col4 = st.columns(4)
-    quick_sent = None
-    with col1:
-        if st.button("Python developer jobs", use_container_width=True):
-            quick_sent = "Find jobs for a Python developer"
-    with col2:
-        if st.button("Data Scientist gap", use_container_width=True):
-            quick_sent = "Skill gap analysis for Data Scientist"
-    with col3:
-        if st.button("Resume tips", use_container_width=True):
-            quick_sent = "Give me resume tips"
-    with col4:
-        if st.button("ML Engineer skills", use_container_width=True):
-            quick_sent = "What skills do I need for ML Engineer?"
+    # ── Tab 1: Dialogflow Messenger (proper embed via st.components.html) ──
+    with tab1:
+        st.markdown(
+            "The chat widget below is powered by your **Dialogflow ES** agent. "
+            "Click the chat bubble at the bottom-right to open it.",
+            unsafe_allow_html=True,
+        )
 
-    # Render chat history
-    for msg in st.session_state.chat_history:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+        # ------------------------------------------------------------------ #
+        # Replace the values below with YOUR agent's details from:            #
+        #   Dialogflow ES Console → Integrations → Dialogflow Messenger       #
+        #   → Enable → Copy embed code                                        #
+        # ------------------------------------------------------------------ #
+        DIALOGFLOW_PROJECT_ID = "jobseekerbot-iqqu"   # ← your GCP project ID
+        DIALOGFLOW_AGENT_ID   = "488e6200-2739-4dca-9b02-067d183a7210"  # ← agent/cx ID
+        CHAT_TITLE            = "JobSeeker AI"
 
-    def detect_intent(text: str) -> str:
-        t = text.lower()
-        if any(w in t for w in ["job", "recommend", "find", "match"]):
-            return "job.recommend"
-        if "gap" in t or ("skill" in t and "need" in t):
-            return "skill.gap"
-        if "resume" in t or " cv" in t:
-            return "resume.tips"
-        return "default.welcome"
+        dialogflow_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8"/>
+          <style>
+            html, body {{
+              margin: 0; padding: 0;
+              height: 600px;
+              background: #f7f6f3;
+              font-family: 'IBM Plex Sans', sans-serif;
+            }}
+            df-messenger {{
+              --df-messenger-bot-message: #1c2b3a;
+              --df-messenger-button-titlebar-color: #1c2b3a;
+              --df-messenger-chat-background-color: #f7f6f3;
+              --df-messenger-font-color: white;
+              --df-messenger-send-icon: #0d7377;
+              --df-messenger-user-message: #0d7377;
+              z-index: 999;
+              position: fixed;
+              bottom: 16px;
+              right: 16px;
+            }}
+          </style>
+          <!-- Dialogflow ES Messenger script -->
+          <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+        </head>
+        <body>
+          <div style="padding:20px;">
+            <h3 style="color:#1c2b3a;font-family:'IBM Plex Serif',serif;margin-bottom:8px;">
+              💼 {CHAT_TITLE}
+            </h3>
+            <p style="color:#6b7280;font-size:0.9rem;line-height:1.6;">
+              Your Dialogflow agent is ready. Click the <strong>chat icon</strong> 
+              at the bottom-right corner to start a conversation.<br/><br/>
+              Try asking:<br/>
+              &bull; <em>"Find jobs for a Python developer"</em><br/>
+              &bull; <em>"Skill gap for Data Scientist"</em><br/>
+              &bull; <em>"Give me resume tips"</em>
+            </p>
+          </div>
 
-    def extract_params(text: str) -> dict:
-        import re
-        p = {}
-        m = re.search(r"for\s+((?:[A-Z][a-z]+\s?)+(?:Engineer|Developer|Scientist|Analyst|Designer|Manager|Lead|Architect))", text, re.I)
-        if m:
-            p["role"] = m.group(1).strip()
-        skills_m = re.findall(r"\b([A-Z][a-zA-Z+#]+(?:\.[a-z]+)?)\b", text)
-        if skills_m:
-            p["skills"] = ", ".join(skills_m[:5])
-        return p
+          <!-- Dialogflow ES Messenger Widget -->
+          <df-messenger
+            intent="WELCOME"
+            chat-title="{CHAT_TITLE}"
+            agent-id="{DIALOGFLOW_AGENT_ID}"
+            language-code="en"
+          ></df-messenger>
+        </body>
+        </html>
+        """
 
-    def send_message(user_text: str):
-        st.session_state.chat_history.append({"role": "user", "content": user_text})
-        with st.chat_message("user"):
-            st.markdown(user_text)
+        components.html(dialogflow_html, height=620, scrolling=False)
 
-        with st.chat_message("assistant"):
-            with st.spinner("Processing…"):
-                payload = {
-                    "text":       user_text,
-                    "intent":     detect_intent(user_text),
-                    "parameters": extract_params(user_text),
+        st.info(
+            "**Setup:** If the chat bubble doesn't appear, go to your "
+            "[Dialogflow ES Console](https://dialogflow.cloud.google.com/) → "
+            "**Integrations** → **Dialogflow Messenger** → Enable and copy your `agent-id`. "
+            "Then update `DIALOGFLOW_AGENT_ID` in this file.",
+            icon=None,
+        )
+
+    # ── Tab 2: Webhook Chat (calls FastAPI backend directly) ──
+    with tab2:
+        st.markdown(
+            "This chat calls your **FastAPI backend** webhook directly at "
+            "`/chatbot/webhook`. Make sure the backend is running.",
+        )
+
+        # Session state for chat history
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = [
+                {
+                    "role": "assistant",
+                    "content": (
+                        "Hello! I'm your JobSeeker AI Assistant.\n\n"
+                        "I can help you with:\n"
+                        "- 💼 Job recommendations based on your skills\n"
+                        "- 📊 Skill gap analysis for a target role\n"
+                        "- 📝 Resume coaching and ATS scoring\n\n"
+                        "How can I help you today?"
+                    ),
                 }
-                base = st.session_state.get("api_url", "http://localhost:8000").rstrip("/")
-                try:
-                    resp = requests.post(f"{base}/chatbot/webhook", json=payload, timeout=30)
-                    resp.raise_for_status()
-                    data  = resp.json()
-                    reply = (
-                        data.get("fulfillmentText")
-                        or (data.get("fulfillmentResponse", {})
-                               .get("messages", [{}])[0]
-                               .get("text", {})
-                               .get("text", [""])[0])
-                        or "No response from server."
-                    )
-                except Exception as e:
-                    reply = f"Could not reach the server at {base}. Verify the backend is running.\n\nError: {e}"
+            ]
 
-            st.markdown(reply)
-            st.session_state.chat_history.append({"role": "assistant", "content": reply})
+        # Quick-action buttons
+        col1, col2, col3, col4 = st.columns(4)
+        quick_sent = None
+        with col1:
+            if st.button("🐍 Python developer jobs", use_container_width=True):
+                quick_sent = "Find jobs for a Python developer"
+        with col2:
+            if st.button("📊 Data Scientist gap", use_container_width=True):
+                quick_sent = "Skill gap analysis for Data Scientist"
+        with col3:
+            if st.button("📝 Resume tips", use_container_width=True):
+                quick_sent = "Give me resume tips"
+        with col4:
+            if st.button("🤖 ML Engineer skills", use_container_width=True):
+                quick_sent = "What skills do I need for ML Engineer?"
 
-    # Handle quick action
-    if quick_sent:
-        send_message(quick_sent)
-        st.rerun()
+        # Render chat history
+        for msg in st.session_state.chat_history:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
 
-    # Chat input
-    user_input = st.chat_input("Type a message…")
-    if user_input:
-        send_message(user_input)
+        def detect_intent(text: str) -> str:
+            t = text.lower()
+            if any(w in t for w in ["job", "recommend", "find", "match", "developer", "engineer"]):
+                return "job.recommend"
+            if "gap" in t or ("skill" in t and ("need" in t or "miss" in t)):
+                return "skill.gap"
+            if "resume" in t or " cv" in t or "ats" in t or "tips" in t:
+                return "resume.tips"
+            return "default.welcome"
 
-    # Clear chat
-    if st.button("Clear conversation", use_container_width=False):
-        st.session_state.chat_history = [st.session_state.chat_history[0]]
-        st.rerun()
+        def extract_params(text: str) -> dict:
+            import re
+            p = {}
+            m = re.search(
+                r"for\s+((?:[A-Z][a-z]+\s?)+(?:Engineer|Developer|Scientist|Analyst|Designer|Manager|Lead|Architect))",
+                text, re.I,
+            )
+            if m:
+                p["role"] = m.group(1).strip()
+            skills_m = re.findall(r"\b([A-Z][a-zA-Z+#]+(?:\.[a-z]+)?)\b", text)
+            if skills_m:
+                p["skills"] = ", ".join(skills_m[:5])
+            return p
+
+        def send_message(user_text: str):
+            st.session_state.chat_history.append({"role": "user", "content": user_text})
+            with st.chat_message("user"):
+                st.markdown(user_text)
+
+            with st.chat_message("assistant"):
+                with st.spinner("Processing…"):
+                    payload = {
+                        "text":       user_text,
+                        "intent":     detect_intent(user_text),
+                        "parameters": extract_params(user_text),
+                    }
+                    base = st.session_state.get("api_url", "http://localhost:8000").rstrip("/")
+                    try:
+                        resp = requests.post(f"{base}/chatbot/webhook", json=payload, timeout=30)
+                        resp.raise_for_status()
+                        data  = resp.json()
+                        reply = (
+                            data.get("fulfillmentText")
+                            or (data.get("fulfillmentResponse", {})
+                                   .get("messages", [{}])[0]
+                                   .get("text", {})
+                                   .get("text", [""])[0])
+                            or "No response from server."
+                        )
+                    except Exception as e:
+                        reply = (
+                            f"⚠️ Could not reach the backend at `{base}`.\n\n"
+                            f"Make sure `uvicorn backend.app:app --reload` is running.\n\n"
+                            f"**Error:** {e}"
+                        )
+
+                st.markdown(reply)
+                st.session_state.chat_history.append({"role": "assistant", "content": reply})
+
+        # Handle quick action
+        if quick_sent:
+            send_message(quick_sent)
+            st.rerun()
+
+        # Chat input
+        user_input = st.chat_input("Type a message… e.g. 'Find Python developer jobs'")
+        if user_input:
+            send_message(user_input)
+
+        # Clear chat
+        if st.button("🗑️ Clear conversation", use_container_width=False):
+            st.session_state.chat_history = [st.session_state.chat_history[0]]
+            st.rerun()
