@@ -76,6 +76,43 @@ section[data-testid="stSidebar"] hr {
     border-color: rgba(255,255,255,0.1) !important;
 }
 
+/* ── Sidebar: Profile & Logout buttons ── */
+section[data-testid="stSidebar"] .stButton > button {
+    background-color: rgba(255,255,255,0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
+    border-radius: 6px !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+}
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background-color: rgba(255,255,255,0.22) !important;
+    border-color: rgba(255,255,255,0.4) !important;
+}
+
+/* ── Sidebar: Backend Configuration input ── */
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] strong,
+section[data-testid="stSidebar"] small {
+    color: rgba(255,255,255,0.85) !important;
+}
+section[data-testid="stSidebar"] .stTextInput > div > div > input {
+    background-color: rgba(255,255,255,0.08) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 6px !important;
+}
+section[data-testid="stSidebar"] .stTextInput > div > div > input::placeholder {
+    color: rgba(255,255,255,0.35) !important;
+}
+
+/* ── Sidebar: caption / code ── */
+section[data-testid="stSidebar"] code {
+    color: #7dd3fc !important;
+    background: rgba(255,255,255,0.08) !important;
+}
+
 /* ── Page background ── */
 .main .block-container {
     background-color: #f7f6f3;
