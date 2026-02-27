@@ -1,127 +1,108 @@
 """
-utils/extract_skills.py
-Member 2 – NLP + ML Engineer
-Resume Parsing & Skill Extraction Module
+extract_skills.py - NLP-based skill extraction from resume text
 """
 
 import re
 import json
-import os
-from typing import Union
+from pathlib import Path
 
-# ---------------------------------------------------------------------------
-# Load skills knowledge-base
-# ---------------------------------------------------------------------------
-_SKILLS_JSON_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "skills.json")
+# Load skill taxonomy
+_SKILLS_PATH = Path(__file__).parent.parent.parent / "data" / "skills.json"
 
-def _load_skills_db(path: str = _SKILLS_JSON_PATH) -> dict:
-    """Load skills.json; fall back to a built-in default if file not found."""
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    # Built-in fallback so the module works out-of-the-box
+def _load_all_known_skills() -> list[str]:
+    """Load all skills from skills.json into a flat list."""
+    with open(_SKILLS_PATH, "r") as f:
+        data = json.load(f)
+    all_skills = []
+    for category, skills in data["skill_categories"].items():
+        all_skills.extend(skills)
+    return all_skills
+
+# Compile known skills at module load
+KNOWN_SKILLS = _load_all_known_skills()
+
+# Aliases and abbreviations
+SKILL_ALIASES = {
+    "ml": "Machine Learning",
+    "ai": "Machine Learning",
+    "dl": "Deep Learning",
+    "nlp": "NLP",
+    "js": "JavaScript",
+    "ts": "TypeScript",
+    "py": "Python",
+    "k8s": "Kubernetes",
+    "tf": "TensorFlow",
+    "cv": "Computer Vision",
+    "ci/cd": "CI/CD",
+    "rest": "REST API",
+    "pg": "PostgreSQL",
+    "mongo": "MongoDB",
+}
+
+def extract_skills(text: str) -> list[str]:
+    """
+    Extract skills from free-form text (e.g., resume, bio).
+    Returns a deduplicated list of matched skills.
+    """
+    if not text:
+        return []
+
+    text_lower = text.lower()
+    found = set()
+
+    # Match known skills (case-insensitive)
+    for skill in KNOWN_SKILLS:
+        # Use word boundary matching for short skills to avoid false positives
+        pattern = r'\b' + re.escape(skill.lower()) + r'\b'
+        if re.search(pattern, text_lower):
+            found.add(skill)
+
+    # Match aliases
+    for alias, canonical in SKILL_ALIASES.items():
+        pattern = r'\b' + re.escape(alias) + r'\b'
+        if re.search(pattern, text_lower):
+            found.add(canonical)
+
+    return sorted(found)
+
+
+def extract_skills_from_resume(resume_text: str) -> dict:
+    """
+    Parse a resume and return structured skill information.
+    Returns:
+        {
+            "extracted_skills": [...],
+            "skill_count": N,
+            "categories": { category: [skills] }
+        }
+    """
+    with open(_SKILLS_PATH, "r") as f:
+        skills_data = json.load(f)
+
+    extracted = extract_skills(resume_text)
+
+    # Categorize found skills
+    categories = {}
+    for category, skill_list in skills_data["skill_categories"].items():
+        matched = [s for s in skill_list if s in extracted]
+        if matched:
+            categories[category] = matched
+
     return {
-        "technical": [
-            "Python", "Java", "JavaScript", "TypeScript", "C++", "C#", "Go", "Rust",
-            "SQL", "MySQL", "PostgreSQL", "MongoDB", "Redis", "SQLite",
-            "Machine Learning", "Deep Learning", "NLP", "Computer Vision",
-            "TensorFlow", "PyTorch", "Keras", "Scikit-learn", "XGBoost",
-            "Pandas", "NumPy", "Matplotlib", "Seaborn", "Plotly",
-            "Django", "Flask", "FastAPI", "React", "Vue", "Angular", "Node.js",
-            "Docker", "Kubernetes", "AWS", "Azure", "GCP", "Terraform",
-            "Git", "GitHub", "CI/CD", "Jenkins", "Linux", "Bash",
-            "REST API", "GraphQL", "Microservices", "Kafka", "Spark",
-            "Excel", "Tableau", "Power BI", "R", "MATLAB", "Statistics",
-            "Data Analysis", "Data Engineering", "ETL", "Hadoop",
-        ],
-        "soft": [
-            "Communication", "Leadership", "Teamwork", "Problem Solving",
-            "Critical Thinking", "Time Management", "Agile", "Scrum", "Kanban",
-            "Project Management", "Presentation", "Negotiation",
-        ],
+        "extracted_skills": extracted,
+        "skill_count": len(extracted),
+        "categories": categories,
     }
 
 
-def _clean_text(text: str) -> str:
-    """Lowercase, remove special chars, normalise whitespace."""
-    text = text.lower()
-    text = re.sub(r"[^\w\s\+\#\.]", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-
-def extract_skills(
-    resume_text: str,
-    skills_db_path: str = _SKILLS_JSON_PATH,
-    include_categories: bool = False,
-) -> dict:
-    """
-    Extract skills from raw resume text using keyword matching
-    against skills.json.
-
-    Parameters
-    ----------
-    resume_text : str
-        Raw text content of the resume.
-    skills_db_path : str
-        Path to skills.json knowledge-base.
-    include_categories : bool
-        If True, also return skills broken down by category.
-
-    Returns
-    -------
-    dict
-        {
-            "skills": ["Python", "SQL", ...],               # always present
-            "categorized": {"technical": [...], "soft": [...]}  # if include_categories=True
-        }
-    """
-    if not isinstance(resume_text, str) or not resume_text.strip():
-        return {"skills": [], "error": "Empty or invalid resume text provided."}
-
-    skills_db = _load_skills_db(skills_db_path)
-    cleaned = _clean_text(resume_text)
-
-    found: dict[str, list[str]] = {}  # category -> list of matched skills
-
-    for category, skill_list in skills_db.items():
-        found[category] = []
-        for skill in skill_list:
-            # Build a pattern that matches whole words / phrases
-            pattern = r"\b" + re.escape(skill.lower()) + r"\b"
-            if re.search(pattern, cleaned):
-                found[category].append(skill)
-
-    all_skills = []
-    for skills in found.values():
-        all_skills.extend(skills)
-
-    # Remove duplicates while preserving order
-    seen = set()
-    unique_skills = []
-    for s in all_skills:
-        if s not in seen:
-            seen.add(s)
-            unique_skills.append(s)
-
-    result = {"skills": unique_skills}
-    if include_categories:
-        result["categorized"] = found
-
-    return result
-
-
-# ---------------------------------------------------------------------------
-# CLI test
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    sample_resume = """
-    John Doe | john@example.com
-    Summary: Experienced Data Scientist with 3 years of Python, Machine Learning,
-    and SQL development. Proficient in TensorFlow, Pandas, and NumPy.
-    Worked with AWS and Docker for deployment. Strong Communication and Teamwork skills.
-    Education: B.Tech Computer Science | Projects: Built a Flask REST API, used Scikit-learn
-    for predictive models. Familiar with Tableau and Power BI for visualisation.
+    sample = """
+    Experienced Python developer with 3 years of experience.
+    Proficient in Django, Flask, REST API design, PostgreSQL, and Docker.
+    Familiar with Machine Learning using Scikit-learn and Pandas.
+    Worked with AWS and basic CI/CD pipelines.
     """
-    result = extract_skills(sample_resume, include_categories=True)
-    print(json.dumps(result, indent=2))
+    result = extract_skills_from_resume(sample)
+    print("Extracted Skills:", result["extracted_skills"])
+    print("Total:", result["skill_count"])
+    print("Categories:", result["categories"])

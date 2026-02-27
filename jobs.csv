@@ -1,0 +1,16 @@
+job_id,title,company,location,skills_required,experience_level,salary_range,description
+1,Python Developer,TechCorp,Bangalore,Python|Django|REST API|SQL,Mid,8-12 LPA,Build scalable backend services using Python and Django.
+2,Data Scientist,Analytics Inc,Hyderabad,Python|Machine Learning|Pandas|Scikit-learn|SQL,Mid,10-15 LPA,Develop ML models for business intelligence.
+3,Frontend Developer,WebWorks,Remote,React|JavaScript|HTML|CSS|TypeScript,Junior,5-8 LPA,Create responsive UIs using React and TypeScript.
+4,Full Stack Developer,StartupX,Pune,Python|React|Node.js|MongoDB|REST API,Mid,12-18 LPA,Build end-to-end web applications.
+5,DevOps Engineer,CloudSys,Bangalore,AWS|Docker|Kubernetes|CI/CD|Linux,Senior,18-25 LPA,Manage cloud infrastructure and deployment pipelines.
+6,ML Engineer,AIVentures,Hyderabad,Python|TensorFlow|PyTorch|Machine Learning|Deep Learning,Senior,20-30 LPA,Build and deploy ML models at scale.
+7,Backend Developer,FinTech Ltd,Mumbai,Java|Spring Boot|Microservices|SQL|REST API,Mid,10-16 LPA,Develop microservices for financial applications.
+8,Data Analyst,InsightCo,Chennai,SQL|Excel|Power BI|Python|Statistics,Junior,4-7 LPA,Analyze business data and create dashboards.
+9,Cloud Architect,MegaCorp,Remote,AWS|Azure|GCP|Terraform|Architecture,Senior,30-45 LPA,Design cloud solutions for enterprise clients.
+10,NLP Engineer,TextAI,Bangalore,Python|NLP|BERT|Transformers|Machine Learning,Mid,15-22 LPA,Develop natural language processing solutions.
+11,React Native Developer,MobileFirst,Hyderabad,React Native|JavaScript|iOS|Android|REST API,Mid,8-14 LPA,Build cross-platform mobile applications.
+12,Cybersecurity Analyst,SecureNet,Delhi,Network Security|Python|SIEM|Penetration Testing|Linux,Mid,12-18 LPA,Monitor and protect organizational IT systems.
+13,Software Engineer,ProductHQ,Bangalore,Python|Golang|Microservices|gRPC|PostgreSQL,Mid,14-20 LPA,Design and implement high-performance backend services.
+14,AI/ML Intern,FutureTech,Remote,Python|Machine Learning|Data Analysis|Pandas,Entry,3-5 LPA,Assist in building AI solutions and data pipelines.
+15,System Analyst,Enterprise Inc,Noida,System Design|UML|SQL|Business Analysis|Documentation,Senior,10-15 LPA,Analyze and design IT systems for enterprise clients.

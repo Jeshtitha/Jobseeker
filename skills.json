@@ -1,0 +1,88 @@
+{
+  "skill_categories": {
+    "programming_languages": [
+      "Python", "JavaScript", "Java", "TypeScript", "Golang", "C++", "C#", "Ruby", "Rust", "Kotlin", "Swift"
+    ],
+    "web_frameworks": [
+      "Django", "Flask", "FastAPI", "React", "Vue.js", "Angular", "Node.js", "Spring Boot", "Express.js", "Next.js"
+    ],
+    "data_science_ml": [
+      "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "Scikit-learn", "Keras",
+      "NLP", "Computer Vision", "BERT", "Transformers", "XGBoost", "Pandas", "NumPy"
+    ],
+    "databases": [
+      "SQL", "PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch", "Cassandra", "DynamoDB", "SQLite"
+    ],
+    "cloud_devops": [
+      "AWS", "Azure", "GCP", "Docker", "Kubernetes", "Terraform", "CI/CD", "Jenkins", "GitHub Actions",
+      "Linux", "Shell Scripting", "Ansible"
+    ],
+    "data_analysis": [
+      "Excel", "Power BI", "Tableau", "Statistics", "Data Visualization", "R", "SPSS", "Jupyter"
+    ],
+    "architecture_design": [
+      "Microservices", "REST API", "gRPC", "GraphQL", "System Design", "Architecture", "Design Patterns", "UML"
+    ],
+    "security": [
+      "Network Security", "Penetration Testing", "SIEM", "Cybersecurity", "OAuth", "JWT", "Encryption"
+    ],
+    "mobile": [
+      "React Native", "Flutter", "iOS", "Android", "Swift", "Kotlin"
+    ],
+    "soft_skills": [
+      "Communication", "Problem Solving", "Teamwork", "Leadership", "Time Management", "Critical Thinking",
+      "Adaptability", "Creativity"
+    ]
+  },
+  "skill_roadmaps": {
+    "Python Developer": {
+      "beginner": ["Python", "SQL", "REST API", "Git"],
+      "intermediate": ["Django", "Flask", "FastAPI", "PostgreSQL", "Docker"],
+      "advanced": ["Microservices", "Kubernetes", "System Design", "AWS"]
+    },
+    "Data Scientist": {
+      "beginner": ["Python", "SQL", "Statistics", "Pandas", "NumPy"],
+      "intermediate": ["Machine Learning", "Scikit-learn", "Data Visualization", "Jupyter"],
+      "advanced": ["Deep Learning", "TensorFlow", "PyTorch", "MLOps", "Cloud Platforms"]
+    },
+    "Frontend Developer": {
+      "beginner": ["HTML", "CSS", "JavaScript", "Git"],
+      "intermediate": ["React", "TypeScript", "REST API", "Testing"],
+      "advanced": ["Next.js", "Performance Optimization", "CI/CD", "Design Systems"]
+    },
+    "DevOps Engineer": {
+      "beginner": ["Linux", "Shell Scripting", "Git", "Docker"],
+      "intermediate": ["Kubernetes", "CI/CD", "AWS", "Terraform"],
+      "advanced": ["Cloud Architecture", "Security", "Observability", "SRE Practices"]
+    },
+    "ML Engineer": {
+      "beginner": ["Python", "Machine Learning", "Pandas", "Scikit-learn"],
+      "intermediate": ["Deep Learning", "TensorFlow", "PyTorch", "Cloud Platforms"],
+      "advanced": ["MLOps", "Distributed Training", "Model Optimization", "Production Deployment"]
+    },
+    "Full Stack Developer": {
+      "beginner": ["HTML", "CSS", "JavaScript", "Python", "SQL"],
+      "intermediate": ["React", "Node.js", "REST API", "MongoDB", "Docker"],
+      "advanced": ["Microservices", "AWS", "System Design", "Performance Optimization"]
+    }
+  },
+  "learning_resources": {
+    "Python": ["Coursera Python for Everybody", "Official Python Docs", "Real Python", "LeetCode (Python)"],
+    "Machine Learning": ["Andrew Ng ML Course", "fast.ai", "Hands-On ML (Book)", "Kaggle Learn"],
+    "React": ["React Docs (react.dev)", "Scrimba React Course", "Full Stack Open"],
+    "AWS": ["AWS Training", "A Cloud Guru", "AWS Certified Developer Prep"],
+    "Docker": ["Docker Official Docs", "Docker & Kubernetes (Udemy)", "Play with Docker"],
+    "SQL": ["Mode SQL Tutorial", "SQLZoo", "LeetCode Database Problems"]
+  },
+  "resume_keywords": {
+    "impact_verbs": [
+      "Developed", "Designed", "Implemented", "Optimized", "Automated", "Architected",
+      "Led", "Delivered", "Reduced", "Increased", "Built", "Deployed", "Streamlined",
+      "Integrated", "Migrated", "Refactored", "Improved", "Created", "Managed"
+    ],
+    "quantifiers": [
+      "Reduced load time by X%", "Increased throughput by X%", "Managed team of X engineers",
+      "Served X+ users", "Reduced costs by $X", "Improved accuracy by X%"
+    ]
+  }
+}
