@@ -244,7 +244,7 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
 
 
 def api_post(endpoint: str, payload: dict) -> Optional[dict]:
-    base = st.session_state.get("api_url", "http://localhost:8000").rstrip("/")
+    base = st.session_state.get("api_url", "https://jobseeker-backend-z648.onrender.com").rstrip("/")
     try:
         resp = requests.post(f"{base}{endpoint}", json=payload, timeout=30)
         resp.raise_for_status()
@@ -306,7 +306,7 @@ with st.sidebar:
     st.markdown("**Backend Configuration**")
     api_url = st.text_input(
         "API URL",
-        value=st.session_state.get("api_url", "http://localhost:8000"),
+        value=st.session_state.get("api_url", "https://jobseeker-backend-z648.onrender.com"),
         label_visibility="collapsed",
     )
     st.session_state["api_url"] = api_url
