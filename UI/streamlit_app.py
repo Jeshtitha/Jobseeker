@@ -267,7 +267,7 @@ def skill_tags_html(skills: list, cls: str = "tag-neutral") -> str:
 
 
 def check_health() -> bool:
-    base = st.session_state.get("api_url", "http://localhost:8000").rstrip("/")
+    base = st.session_state.get("api_url", "https://jobseeker-backend-z648.onrender.com").rstrip("/")
     try:
         r = requests.get(f"{base}/health", timeout=5)
         return r.ok
@@ -974,7 +974,7 @@ elif page == "AI Assistant":
                         "intent":     detect_intent(user_text),
                         "parameters": extract_params(user_text),
                     }
-                    base = st.session_state.get("api_url", "http://localhost:8000").rstrip("/")
+                    base = st.session_state.get("api_url", "https://jobseeker-backend-z648.onrender.com").rstrip("/")
                     try:
                         resp = requests.post(f"{base}/chatbot/webhook", json=payload, timeout=30)
                         resp.raise_for_status()
